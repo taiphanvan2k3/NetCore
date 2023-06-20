@@ -10,7 +10,5 @@ namespace MyAttribute
         {
             ThongTinChiTiet = _ThongTinchiTiet;
         }
-
-
     }
 }

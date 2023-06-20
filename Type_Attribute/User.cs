@@ -16,7 +16,9 @@ namespace Type_Attribute
         public int Age { get; set; }
 
         [Mota("So dien thoai ca nhan")]
-        [Phone]
+        // [Phone]
+        [RegularExpression(@"^(?!0+$)((\+\d{1,2}[- ]?)|0)[35789](?!0+$)\d{8}$", ErrorMessage = "So dien thoai khong hop le")]
+        
         public string? PhoneNumber { get; set; }
 
         [Mota("Email ca nhan")]

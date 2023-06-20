@@ -76,7 +76,11 @@ namespace Type_Attribute
             {
                 Name = "Tai",
                 Age = 20,
-                PhoneNumber = "0905...",
+                PhoneNumber = "+84 905123440",
+                // PhoneNumber = "0905123440",
+                // PhoneNumber = "+84  905123440",
+                // PhoneNumber = "+84 0905123440",
+                // PhoneNumber = "+84-0905123440",
                 Email = "taiphanvan2403"
             };
 
