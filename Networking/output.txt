@@ -1,0 +1,20 @@
+{
+  "args": {},
+  "data": {},
+  "files": {},
+  "form": {
+    "fileUpload": "Đây là nội dung sẽ được upload lên server",
+    "string-content": "            {\"collections\":                 [                    {                        \"id\": \"dac5eac9-148d-a32e-b76b-3edee9da28f7\",                        \"name\": \"Cloud API\",\"owner\": \"631643\",                        \"uid\": \"631643-dac5eac9-148d-a32e-b76b-3edee9da28f7\"                    }                ]            }"
+  },
+  "headers": {
+    "x-forwarded-proto": "https",
+    "x-forwarded-port": "443",
+    "host": "postman-echo.com",
+    "x-amzn-trace-id": "Root=1-64a1374a-411379ab3a7e925f4c4ad2fa",
+    "content-length": "656",
+    "user-agent": "Mozilla/5.0",
+    "content-type": "multipart/form-data; boundary=\"3ab93fd2-dff7-4b62-9b17-93ffdd95b70a\""
+  },
+  "json": null,
+  "url": "https://postman-echo.com/post"
+}

@@ -101,7 +101,10 @@ namespace Type_Attribute
 
         static void Main(string[] args)
         {
-            Ex3();
+            // Ex3();
+            string str= null;
+            str??="a";
+            System.Console.WriteLine(str);
         }
     }
 }
