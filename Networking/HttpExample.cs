@@ -79,6 +79,7 @@ namespace Networking
                 // Tạo ra vùng đệm gồm 500 bytes
                 var buffer = new byte[SIZEBUFFER];
 
+                // Liên quan đến việc ghi/đọc file cũng dùng using
                 using var streamWrite = File.OpenWrite(fileName);
                 bool eof = false;
                 do

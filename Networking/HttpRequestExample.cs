@@ -8,6 +8,7 @@ namespace Networking
     {
         public static async Task GetMethod()
         {
+            // Giúp giải phóng tài nguyên liên quan đến luồng, chẳng hạn như kết nối mạng, một cách tự động và chính xác.
             using var httpClient = new HttpClient();
 
             // Tạo ra đối tượng HttpRequestMessage
@@ -65,6 +66,7 @@ namespace Networking
 
         public static async Task PostMethod2()
         {
+            // Giúp giải phóng tài nguyên liên quan đến luồng, chẳng hạn như kết nối mạng, một cách tự động và chính xác.
             using var httpClient = new HttpClient();
 
             // Tạo ra đối tượng HttpRequestMessage
@@ -116,6 +118,7 @@ namespace Networking
 
         public static async Task MultiPartFormData()
         {
+            // Giúp giải phóng tài nguyên liên quan đến luồng, chẳng hạn như kết nối mạng, một cách tự động và chính xác.
             using var httpClient = new HttpClient();
 
             // Tạo ra đối tượng HttpRequestMessage
@@ -149,7 +152,7 @@ namespace Networking
                 ]
             }";
 
-            json= json.Replace("\r\n","");
+            json = json.Replace("\r\n", "");
             // Chỉ có MultipartFormDataContent mới par
             content.Add(new StringContent(json, Encoding.UTF8, "application/json"), "string-content");
 
