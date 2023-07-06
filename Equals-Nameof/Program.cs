@@ -45,7 +45,7 @@
 
         private static string Test3(Student s)
         {
-            if(String.IsNullOrEmpty(s.Name))
+            if (String.IsNullOrEmpty(s.Name))
             {
                 // Dùng nameof chứ không dùng tên cụ thể, vì giả sử sau này Name đổi thành MyName thì phải sửa lại
                 // throw new Exception($"Loi xay ra tai thuoc tinh: MyName");
@@ -54,7 +54,7 @@
             return "Kq: " + s.Name;
         }
 
-        static void Main(string[] args)
+        private static void ImplementTest3()
         {
             Student s = new Student() { Id = 1 };
             try
@@ -66,6 +66,28 @@
             {
                 System.Console.WriteLine(e.Message);
             }
+        }
+
+        private static void Test4()
+        {
+            // Phương thức Join này nhận tham số thứ 2 là INumerable<T> nên có thể truyền các danh sách có kiểu
+            // bất kì vào
+            List<string> li = new List<string>() { "1", "2", "3", "4", "5" };
+            var str = string.Join(",", li);
+
+            List<int> li2 = new List<int>() { 1, 2, 3, 4, 5 };
+            var str2 = string.Join(",", li);
+
+            // Kết quả: 1,2,3,4,5
+            System.Console.WriteLine(str);
+
+            // Kết quả: 1,2,3,4,5
+            System.Console.WriteLine(str2);
+        }
+
+        static void Main(string[] args)
+        {
+            Test4();
         }
     }
 }
