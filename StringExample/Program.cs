@@ -22,15 +22,37 @@
             System.Console.WriteLine(str5);
         }
 
+        public static void Example2()
+        {
+            Dictionary<KeyValuePair<int, string>, int> d = new();
+            d.Add(new KeyValuePair<int, string>(1, "1,2"), 2);
+            d.Add(new KeyValuePair<int, string>(1, "1,3"), 20);
+            if (d.ContainsKey(new KeyValuePair<int, string>(1, "1,3")))
+            {
+                Console.WriteLine("yes");
+            }
+            else
+            {
+                System.Console.WriteLine("no");
+            }
+        }
+
         public static void Test(string name)
         {
             ////System.Console.WriteLine(name);
+            
+        }
+
+
+        public decimal Test1()
+        {
         }
 
         static void Main(string[] args)
         {
-            Example1();
-            Test(name: "anc");
+            // Example1();
+            // Test(name: "anc");
+            Example2();
         }
     }
 }
