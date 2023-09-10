@@ -1,4 +1,6 @@
-﻿namespace Netcore
+﻿using AsyncAwait;
+
+namespace Netcore
 {
     public class Program
     {
@@ -199,7 +201,8 @@
 
             // Một khi phươ
             // await Learn02.Demo3();
-            await Learn02.Demo4();
+            // await Learn02.Demo4();
+            await new Example()._ExampleAsync2();
         }
     }
 }
