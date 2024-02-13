@@ -1,13 +1,12 @@
-using System.IdentityModel.Tokens.Jwt;
-using System.Reflection.Metadata.Ecma335;
-using System.Security.Claims;
-using System.Security.Cryptography;
-using System.Text;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using NetCore.ReviewWebAPI;
 using ReviewWebAPI.Models.Schemas;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Security.Cryptography;
+using System.Text;
 
 namespace ReviewWebAPI.Controllers
 {
@@ -50,7 +49,10 @@ namespace ReviewWebAPI.Controllers
                     new Claim("username", user.UserName),
                     new Claim("iss", _appSetting.Issuer),
                     new Claim("aud", _appSetting.Audience),
-                    new Claim(ClaimTypes.Role, "Client")
+
+                    // Lúc này trong token sẽ có 2 role là HR và giá trị của user.Role
+                    //new Claim(ClaimTypes.Role, "Employee"),
+                    new Claim(ClaimTypes.Role, user.Role)
                 }),
                 Expires = DateTime.UtcNow.AddDays(7),
 
@@ -72,7 +74,7 @@ namespace ReviewWebAPI.Controllers
         [HttpPost("Register")]
         public IActionResult Register([FromBody] RegisterDto model)
         {
-            UserDto user = new() { UserName = model.UserName };
+            UserDto user = new() { UserName = model.UserName, Role = model.Role };
             if (model.ConfirmPassword == model.Password)
             {
                 using HMACSHA512 hMACSHA512 = new();

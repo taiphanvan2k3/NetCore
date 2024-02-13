@@ -1,10 +1,15 @@
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ReviewWebAPI.Controllers
 {
     [Route("api/[controller]")]
-    [Authorize]
+
+    // Khi muốn có cả 2 role mới có thể truy cập
+    //[Authorize(Roles = "Admin")]
+    //[Authorize(Roles = "Manager")]
+
+    [Authorize(Roles = "Admin, Employee, HR")]
     [ApiController]
     public class ItemsController : ControllerBase
     {
@@ -18,7 +23,7 @@ namespace ReviewWebAPI.Controllers
                 var context = HttpContext.User;
                 return colorList;
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 throw;
             }

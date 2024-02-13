@@ -12,5 +12,8 @@ namespace ReviewWebAPI.Models.Schemas
 
         [Required]
         public string ConfirmPassword { get; set; }
+
+        [Required]
+        public string Role { get; set; }
     }
 }
