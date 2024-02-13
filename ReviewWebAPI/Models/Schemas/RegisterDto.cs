@@ -15,5 +15,10 @@ namespace ReviewWebAPI.Models.Schemas
 
         [Required]
         public string Role { get; set; }
+
+        public DateTime BirthDay { get; set; }
+
+        [Required]
+        public string SchoolName { get; set; }
     }
 }

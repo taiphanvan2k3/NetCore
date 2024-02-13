@@ -52,7 +52,10 @@ namespace ReviewWebAPI.Controllers
 
                     // Lúc này trong token sẽ có 2 role là HR và giá trị của user.Role
                     //new Claim(ClaimTypes.Role, "Employee"),
-                    new Claim(ClaimTypes.Role, user.Role)
+                    new Claim(ClaimTypes.Role, user.Role),
+
+                    new Claim(ClaimTypes.DateOfBirth, user.BirthDay.ToShortDateString()),
+                    new Claim("school", user.SchoolName)
                 }),
                 Expires = DateTime.UtcNow.AddDays(7),
 
@@ -74,7 +77,13 @@ namespace ReviewWebAPI.Controllers
         [HttpPost("Register")]
         public IActionResult Register([FromBody] RegisterDto model)
         {
-            UserDto user = new() { UserName = model.UserName, Role = model.Role };
+            UserDto user = new()
+            {
+                UserName = model.UserName,
+                Role = model.Role,
+                BirthDay = model.BirthDay,
+                SchoolName = model.SchoolName
+            };
             if (model.ConfirmPassword == model.Password)
             {
                 using HMACSHA512 hMACSHA512 = new();
