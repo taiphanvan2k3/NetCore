@@ -1,4 +1,5 @@
 ﻿using AsyncAwait;
+using NetCore.AsyncAwait;
 
 namespace Netcore
 {
@@ -202,7 +203,9 @@ namespace Netcore
             // Một khi phươ
             // await Learn02.Demo3();
             // await Learn02.Demo4();
-            await new Example()._ExampleAsync3();
+            // await new Example()._ExampleAsync3();
+            Example2 example = new();
+            await example.Test5();
         }
     }
 }

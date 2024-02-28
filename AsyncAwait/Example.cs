@@ -37,7 +37,7 @@ namespace AsyncAwait
             }
             System.Console.WriteLine();
             t1.Wait();
-            await GetData3();
+            // await GetData3();
             for (int i = 1; i <= 1000; i++)
             {
                 Console.Write(i + " ");
