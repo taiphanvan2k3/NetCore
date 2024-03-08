@@ -21,7 +21,16 @@ builder.Services.AddAuthentication(x =>
 {
     x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
     x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-}).AddJwtBearer(options =>
+})
+.AddCookie(x =>
+{
+    // Do cookie có tên là token là 1 cookie HttpOnly 
+    // User chỉ được xem là IsAuthenticated nếu có cookie
+    // Đây chỉ mới là điều kiện cần, vì còn phải qua lớp JWT Authentication nữa thì mới được coi là IsAuthenticated
+    // Không cần Cookie Authentication này mà chỉ cần dùng JWT Authentication là cũng được rồi
+    x.Cookie.Name = "token";
+})
+.AddJwtBearer(options =>
 {
     options.RequireHttpsMetadata = false;
     options.SaveToken = true;
@@ -35,6 +44,15 @@ builder.Services.AddAuthentication(x =>
         ValidateAudience = true,
         ValidIssuer = configuration["ApplicationSettings:Issuer"],
         ValidAudience = configuration["ApplicationSettings:Audience"],
+    };
+    options.Events = new JwtBearerEvents()
+    {
+        OnMessageReceived = context =>
+        {
+            // Khi một request gửi tới, nó sẽ đọc giá trị của cookie "token" và sử dụng nó cho phần JWT Authentication
+            context.Token = context.Request.Cookies["token"];
+            return Task.CompletedTask;
+        }
     };
 });
 

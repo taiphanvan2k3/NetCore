@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.VisualBasic;
 using NetCore.ReviewWebAPI;
 using ReviewWebAPI.Models.Schemas;
 using System.IdentityModel.Tokens.Jwt;
@@ -67,6 +68,7 @@ namespace ReviewWebAPI.Controllers
             // Này là 1 string
             var encrypterToken = tokenHandler.WriteToken(token);
 
+            JWTGenerator(user);
             return Ok(new
             {
                 token = encrypterToken,
@@ -106,6 +108,45 @@ namespace ReviewWebAPI.Controllers
             using HMACSHA512 hMACSHA512 = new(user.PasswordSalt);
             var compute = hMACSHA512.ComputeHash(Encoding.UTF8.GetBytes(password));
             return compute.SequenceEqual(user.PasswordHash);
+        }
+
+        [NonAction]
+        // Hoặc chuyển về private hoặc dùng [NonAction]
+        public dynamic JWTGenerator(UserDto user)
+        {
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var key = Encoding.ASCII.GetBytes(_appSetting.Secret);
+
+            var tokenDescriptor = new SecurityTokenDescriptor()
+            {
+                Subject = new ClaimsIdentity(new[]
+                {
+                    new Claim("id", user.UserName),
+                    new Claim(ClaimTypes.Role, user.Role),
+                    new Claim("iss", _appSetting.Issuer),
+                    new Claim("aud", _appSetting.Audience)
+                }),
+                Expires = DateTime.UtcNow.AddDays(7),
+                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha512Signature)
+            };
+
+            var token = tokenHandler.CreateToken(tokenDescriptor);
+            var encryptToken = tokenHandler.WriteToken(token);
+
+            HttpContext.Response.Cookies.Append("token", encryptToken, new CookieOptions
+            {
+                Expires = DateTime.UtcNow.AddDays(7),
+                HttpOnly = true,
+                Secure = true,
+                IsEssential = true,
+                SameSite = SameSiteMode.None
+            });
+
+            return new
+            {
+                token = encryptToken,
+                username = user.UserName
+            };
         }
     }
 }
