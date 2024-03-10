@@ -2,7 +2,9 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.IdentityModel.Tokens;
 using NetCore.ReviewWebAPI;
+using NetCore.ReviewWebAPI.Services;
 using ReviewWebAPI.Authorization;
+using ReviewWebAPI.Middlewares;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -21,14 +23,6 @@ builder.Services.AddAuthentication(x =>
 {
     x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
     x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-})
-.AddCookie(x =>
-{
-    // Do cookie có tên là token là 1 cookie HttpOnly 
-    // User chỉ được xem là IsAuthenticated nếu có cookie
-    // Đây chỉ mới là điều kiện cần, vì còn phải qua lớp JWT Authentication nữa thì mới được coi là IsAuthenticated
-    // Không cần Cookie Authentication này mà chỉ cần dùng JWT Authentication là cũng được rồi
-    x.Cookie.Name = "token";
 })
 .AddJwtBearer(options =>
 {
@@ -49,8 +43,26 @@ builder.Services.AddAuthentication(x =>
     {
         OnMessageReceived = context =>
         {
-            // Khi một request gửi tới, nó sẽ đọc giá trị của cookie "token" và sử dụng nó cho phần JWT Authentication
-            context.Token = context.Request.Cookies["token"];
+            context.Token = context.Request.Cookies["X-Access-Token"];
+
+            // Dùng thêm header trong trường hợp đã cấp 1 access token mới ở TokenRefreshMiddleware
+            // Vì ở TokenRefreshMiddleware nếu có tạo ra access token mới nhưng nó nằm ở Cookie response nên lúc
+            // ở OnMessageReceived này truy cập cookie để lấy thì chưa có nên lấy thông qua header
+            var authorizationHeader = context.Request.Headers["Authorization"].FirstOrDefault();
+            if (!string.IsNullOrEmpty(authorizationHeader))
+            {
+                // Tách chuỗi "Bearer" và token
+                var parts = authorizationHeader.Trim().Split(' ');
+                if (parts.Length == 2 && parts[0].Equals("Bearer", StringComparison.OrdinalIgnoreCase))
+                {
+                    var token = parts[1];
+                    if (!string.IsNullOrEmpty(token))
+                    {
+                        context.Token = token;
+                    }
+                }
+            }
+
             return Task.CompletedTask;
         }
     };
@@ -79,6 +91,7 @@ builder.Services.AddAuthorization(options =>
 
 builder.Services.AddSingleton<IAuthorizationHandler, IsOldEnoughWithRoleHandler>();
 builder.Services.AddSingleton<IAuthorizationHandler, IsStudentDUTHandler>();
+builder.Services.AddSingleton<ITokenService, TokenService>();
 
 var app = builder.Build();
 
@@ -91,8 +104,12 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+// Cần đặt Middleware này nằm trước Authentication
+// vì để cấp lại access token mới trước khi đi vào OnMessageReceived
+app.UseMiddleware<TokenRefreshMiddleware>();
 app.UseAuthentication();
 app.UseAuthorization();
+
 
 app.MapControllers();
 

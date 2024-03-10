@@ -20,5 +20,11 @@ namespace ReviewWebAPI.Models.Schemas
 
         [Required]
         public string SchoolName { get; set; }
+
+        public string Token { get; set; }
+
+        public DateTime TokenCreated { get; set; }
+
+        public DateTime TokenExpires { get; set; }
     }
 }

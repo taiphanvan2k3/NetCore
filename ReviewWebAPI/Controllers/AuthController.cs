@@ -1,11 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Options;
-using Microsoft.IdentityModel.Tokens;
-using Microsoft.VisualBasic;
-using NetCore.ReviewWebAPI;
+using NetCore.ReviewWebAPI.Services;
 using ReviewWebAPI.Models.Schemas;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 
@@ -15,18 +10,17 @@ namespace ReviewWebAPI.Controllers
     [ApiController]
     public class AuthController : ControllerBase
     {
-        private static readonly List<UserDto> fakeUsersList = new();
-        private readonly AppSetting _appSetting;
+        private readonly ITokenService _tokenService;
 
-        public AuthController(IOptions<AppSetting> appSetting)
+        public AuthController(ITokenService tokenService)
         {
-            _appSetting = appSetting?.Value ?? throw new ArgumentNullException(nameof(appSetting));
+            _tokenService = tokenService;
         }
 
         [HttpPost("Login")]
         public IActionResult Login([FromBody] LoginDto model)
         {
-            var user = fakeUsersList
+            var user = ListUsers.fakeUsersList
                 .FirstOrDefault(u => u.UserName == model.UserName);
             if (user == null)
             {
@@ -39,40 +33,12 @@ namespace ReviewWebAPI.Controllers
                 return BadRequest("Password is incorrect");
             }
 
-            // Tạo token
-            var tokenHandler = new JwtSecurityTokenHandler();
-
-            // Ở đây dùng mã ASCII cũng được vì secret key thường là tiếng Anh nên bảng mã ASCII có thể biểu diễn được
-            var key = Encoding.ASCII.GetBytes(_appSetting.Secret);
-            var tokenDescriptor = new SecurityTokenDescriptor()
-            {
-                Subject = new ClaimsIdentity(new[] {
-                    new Claim("username", user.UserName),
-                    new Claim("iss", _appSetting.Issuer),
-                    new Claim("aud", _appSetting.Audience),
-
-                    // Lúc này trong token sẽ có 2 role là HR và giá trị của user.Role
-                    //new Claim(ClaimTypes.Role, "Employee"),
-                    new Claim(ClaimTypes.Role, user.Role),
-
-                    new Claim(ClaimTypes.DateOfBirth, user.BirthDay.ToShortDateString()),
-                    new Claim("school", user.SchoolName)
-                }),
-                Expires = DateTime.UtcNow.AddDays(7),
-
-                // key này phải giống với key lúc configure JWT Bearer
-                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha512Signature)
-            };
-            var token = tokenHandler.CreateToken(tokenDescriptor);
-
-            // Này là 1 string
-            var encrypterToken = tokenHandler.WriteToken(token);
-
-            JWTGenerator(user);
+            var tokens = _tokenService.JWTGenerator(user, HttpContext);
             return Ok(new
             {
-                token = encrypterToken,
-                userName = user.UserName
+                tokens.accessToken,
+                tokens.refreshToken.Token,
+                tokens.username
             });
         }
 
@@ -99,7 +65,7 @@ namespace ReviewWebAPI.Controllers
                 return BadRequest("Confirm password doesn't match");
             }
 
-            fakeUsersList.Add(user);
+            ListUsers.fakeUsersList.Add(user);
             return Ok(user);
         }
 
@@ -110,43 +76,22 @@ namespace ReviewWebAPI.Controllers
             return compute.SequenceEqual(user.PasswordHash);
         }
 
-        [NonAction]
-        // Hoặc chuyển về private hoặc dùng [NonAction]
-        public dynamic JWTGenerator(UserDto user)
+        /// <summary>
+        /// Gọi API này để refresh lại access token
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("refresh-token")]
+        public ActionResult<string> RefreshToken()
         {
-            var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.ASCII.GetBytes(_appSetting.Secret);
+            var refreshToken = Request.Cookies["X-Refresh-Token"];
+            var user = ListUsers.fakeUsersList.Where(x => x.Token == refreshToken).FirstOrDefault();
 
-            var tokenDescriptor = new SecurityTokenDescriptor()
+            if (user == null || user.TokenExpires < DateTime.Now)
             {
-                Subject = new ClaimsIdentity(new[]
-                {
-                    new Claim("id", user.UserName),
-                    new Claim(ClaimTypes.Role, user.Role),
-                    new Claim("iss", _appSetting.Issuer),
-                    new Claim("aud", _appSetting.Audience)
-                }),
-                Expires = DateTime.UtcNow.AddDays(7),
-                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha512Signature)
-            };
-
-            var token = tokenHandler.CreateToken(tokenDescriptor);
-            var encryptToken = tokenHandler.WriteToken(token);
-
-            HttpContext.Response.Cookies.Append("token", encryptToken, new CookieOptions
-            {
-                Expires = DateTime.UtcNow.AddDays(7),
-                HttpOnly = true,
-                Secure = true,
-                IsEssential = true,
-                SameSite = SameSiteMode.None
-            });
-
-            return new
-            {
-                token = encryptToken,
-                username = user.UserName
-            };
+                return Unauthorized("Token has expired");
+            }
+            _tokenService.JWTGenerator(user, HttpContext);
+            return Ok();
         }
     }
 }
