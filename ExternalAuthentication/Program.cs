@@ -1,15 +1,25 @@
 using ExternalAuthentication.Data;
+using Microsoft.AspNetCore.Authentication.Facebook;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using NetCore.ExternalAuthentication;
 
 var builder = WebApplication.CreateBuilder(args);
 
 var configuration = builder.Configuration;
-builder.Services.AddAuthentication()
+builder.Services.AddAuthentication(options =>
+    {
+        options.DefaultScheme = FacebookDefaults.AuthenticationScheme;
+    })
     .AddGoogle(googleOptions =>
     {
-        googleOptions.ClientId = configuration["Authentication:Google:ClientId"];
-        googleOptions.ClientSecret = configuration["Authentication:Google:ClientSecret"];
+        googleOptions.ClientId = configuration["Authentication:Google:ClientId"] ?? SecretConstants.GOOGLE_CLIENT_ID;
+        googleOptions.ClientSecret = configuration["Authentication:Google:ClientSecret"] ?? SecretConstants.GOOGLE_CLIENT_SECRET;
+    })
+    .AddFacebook(facebookOptions =>
+    {
+        facebookOptions.AppId = configuration["Authentication:Facebook:ClientId"] ?? SecretConstants.FACEBOOK_CLIENT_ID;
+        facebookOptions.AppSecret = configuration["Authentication:Facebook:ClientSecret"] ?? SecretConstants.FACEBOOK_CLIENT_SECRET;
     });
 
 // Add services to the container.
