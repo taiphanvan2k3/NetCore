@@ -1,4 +1,6 @@
-﻿namespace StringExample
+﻿using StringExample.Models;
+
+namespace StringExample
 {
     public class Program
     {
@@ -15,7 +17,7 @@
             // Bị quăng ngoại lệ nếu truy cập property
             // System.Console.WriteLine($"Length: {str1.Length}");
 
-            string str4 = """abc""";
+            string str4 = "abc";
             string str5 = @"Xin chào
             các bạn.";
             System.Console.WriteLine(str4);
@@ -48,7 +50,8 @@
             // Example1();
             // Test(name: "anc");
             // Example2();
-            DocxExample.Example2();
+            // DocxExample.Example2();
+            new ExportDocxModel().ExportToDocx();
         }
     }
 }
