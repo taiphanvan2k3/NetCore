@@ -43,16 +43,12 @@
             
         }
 
-
-        public decimal Test1()
-        {
-        }
-
         static void Main(string[] args)
         {
             // Example1();
             // Test(name: "anc");
-            Example2();
+            // Example2();
+            DocxExample.Example2();
         }
     }
 }
