@@ -1,0 +1,3 @@
+- dotnet add package Microsoft.EntityFrameworkCore.SqlServer
+- dotnet add package StackExchange.Redis --version 2.7.33
+- dotnet add package Microsoft.Extensions.Caching.StackExchangeRedis
