@@ -17,6 +17,7 @@ public class MyThreadPool
     {
         for (int i = 0; i < Environment.ProcessorCount; i++)
         {
+            // Tạo ra các thread worker, mỗi thread sẽ lấy 1 phần tử từ BlockingCollection và thực hiện công việc đó
             var t = new Thread(() =>
             {
                 Console.WriteLine($"Thread #{Environment.CurrentManagedThreadId} started!");
@@ -34,10 +35,6 @@ public class MyThreadPool
                     }
                     else
                     {
-                        // ExecutionContext.Run(context, _ =>
-                        // {
-                        //     action();
-                        // }, null);
                         ExecutionContext.Run(context, state => ((Action)state!).Invoke(), action);
                     }
                 }

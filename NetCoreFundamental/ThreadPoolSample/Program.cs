@@ -2,6 +2,11 @@
 {
     public class Program
     {
+        static async Task CancellationExample2()
+        {
+            await CancellationExample.Example2();
+        }
+
         static async Task Main(string[] args)
         {
             // for (int i = 1; i < 100; i++)
@@ -14,7 +19,7 @@
             // }
             // Console.ReadLine();
 
-            await AsyncExample.MainTask();
+            // await AsyncExample.MainTask();
         }
     }
 }
