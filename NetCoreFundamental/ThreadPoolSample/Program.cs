@@ -26,6 +26,7 @@
             await TaskExample.CalculateTime02();
             await TaskExample.CalculateTime03();
             TaskExample.CalculateTime04();
+            TaskExample.CalculateWithThread();
         }
 
         static async Task Main(string[] args)

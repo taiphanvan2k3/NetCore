@@ -68,5 +68,19 @@ namespace ThreadPoolSample
             Task.WaitAll(task1, task2);
             Console.WriteLine($"-> Total time: {sw.ElapsedMilliseconds}ms");
         }
+
+        public static void CalculateWithThread()
+        {
+            Console.WriteLine("-> CalculateWithThread");
+            var sw = Stopwatch.StartNew();
+            var (thread1, thread2) = (new Thread(SyncTask), new Thread(SyncTask2));
+
+            thread1.Start();
+            thread2.Start();
+
+            thread1.Join();
+            thread2.Join();
+            Console.WriteLine($"-> Total time: {sw.ElapsedMilliseconds}ms");
+        }
     }
 }
