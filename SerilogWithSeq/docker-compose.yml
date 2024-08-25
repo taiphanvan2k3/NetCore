@@ -1,0 +1,12 @@
+version: '3.4'
+
+services:
+  learning.seq:
+    image: datalust/seq:latest
+    container_name: learning-seq
+    environment:
+      # dùng y để đồng ý với điều khoản sử dụng
+      - ACCEPT_EULA=Y
+    ports:
+      - "5341:5341"
+      - "8081:80"
