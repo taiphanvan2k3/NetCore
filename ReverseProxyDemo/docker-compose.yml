@@ -1,0 +1,25 @@
+version: '3.8'
+
+services:
+  hello.api:
+    build:
+      context: ./Hello.Api
+    environment:
+      - ASPNETCORE_URLS=http://+:5000
+
+  yarp.proxy:
+    build:
+      context: ./Yarp.Proxy
+    ports:
+      - "3000:8080"
+    depends_on:
+      - hello.api
+
+  nginx.proxy:
+    image: nginx:alpine
+    ports:
+      - "3001:80"
+    volumes:
+      - ./Nginx.Proxy/nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - hello.api
